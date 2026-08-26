@@ -1,0 +1,12 @@
+# Normalise text on commit, check out with the platform's endings.
+* text=auto
+
+# Binary assets — never touch, never diff as text.
+*.glb  binary
+*.jpg  binary
+*.jpeg binary
+*.png  binary
+
+# index.html is one large generated-feeling document; keep it out of
+# language stats so the repo is not reported as 100% HTML.
+index.html linguist-detectable=true
