@@ -22,7 +22,7 @@
   "email": "mailto:afonsorosadolopes@gmail.com",
   "address": {
     "@type": "PostalAddress",
-    "addressLocality": "Lisboa",
+    "addressLocality": "Lisbon",
     "addressCountry": "PT"
   },
   "alumniOf": {
@@ -295,6 +295,19 @@
      the same numbers as the old vh values, so nothing moves. */
   .about{
     padding:clamp(56px, 10vh, 104px) 0 clamp(60px, 11vh, 116px);
+  }
+  /* The lead and the identity card used to run to the window's left
+     edge while the paragraph below them was centred, so on a wide
+     screen the section read as two different layouts stacked. They
+     now share one centred measure with the rest of the page. */
+  .about > .lead,
+  .about > .idcard,
+  .about > .sublabel{
+    max-width:1180px;
+    margin-left:auto;
+    margin-right:auto;
+    padding-left:clamp(18px, 4vw, 48px);
+    padding-right:clamp(18px, 4vw, 48px);
   }
   /* Full bleed to the window edge, as in the reference. */
   p.lead{
@@ -2071,15 +2084,14 @@
      ============================================================== */
   .idcard{
     display:flex;
-    align-items:flex-start;
-    gap:clamp(16px, 2.6vw, 30px);
-    padding:0 0 0 6px;
-    margin:26px 0 0;
+    align-items:center;
+    gap:clamp(20px, 3vw, 40px);
+    margin:30px 0 0;
     flex-wrap:wrap;
   }
   .portrait{
     flex:0 0 auto;
-    width:clamp(136px, 17vw, 232px);
+    width:clamp(168px, 21vw, 300px);
     aspect-ratio:1;
     margin:0;
     position:relative;
@@ -2152,7 +2164,7 @@
     .about{padding:60px 0 66px;}
     .statement{padding:64px 0 70px;}
     .statement-line{font-size:min(16.5vw, 10.5rem);}
-    .portrait{width:150px;}
+    .portrait{width:180px;}
     .idcard{margin-top:20px;}
   }
 
@@ -2859,7 +2871,7 @@
         <h3 class="name">Afonso Lopes</h3>
         <dl class="facts">
           <dt>AGE</dt><dd><span data-age="2005-07-01">21</span></dd>
-          <dt>BASED</dt><dd>LISBOA <b>&middot;</b> PORTUGAL</dd>
+          <dt>BASED</dt><dd>LISBON <b>&middot;</b> PORTUGAL</dd>
           <dt>FIELD</dt><dd>TELECOMMUNICATIONS &amp; COMPUTER ENGINEERING</dd>
           <dt>NOW</dt><dd>MSc AT ISCTE <b>&middot;</b> MINOR IN CYBERSECURITY</dd>
         </dl>
@@ -2971,29 +2983,7 @@
           </div>
         </article>
 
-        <article class="proj" data-rv style="--d:.18s">
-          <div class="proj-i">04</div>
-          <div class="proj-b">
-            <h3 class="proj-t">Network and traffic analysis labs</h3>
-            <div class="proj-m">ISCTE &middot; COMPUTER NETWORKS &middot; NETWORK SECURITY AND MANAGEMENT</div>
-            <p>Capturing real traffic and reading it frame by frame in Wireshark: watching a handshake actually happen, following what a protocol puts on the wire against what its specification claims, and finding the gap between the two. The habit this builds &mdash; not trusting a diagram over a capture &mdash; is most of what security work is.</p>
-            <div class="proj-k">
-              <span class="chip">Wireshark</span><span class="chip">TCP/IP</span><span class="chip">Protocol Analysis</span><span class="chip">Network Security</span>
-            </div>
-          </div>
-        </article>
 
-        <article class="proj" data-rv style="--d:.24s">
-          <div class="proj-i">05</div>
-          <div class="proj-b">
-            <h3 class="proj-t">Optical and modulation laboratories</h3>
-            <div class="proj-m">ISCTE &middot; OPTICAL COMMUNICATION SYSTEMS &middot; MODULATION AND CODING</div>
-            <p>The physical layer, measured rather than assumed: how a signal is put onto a carrier, what it costs to get it back out at the far end, and what light does over a fibre that a copper model would have you expect wrongly.</p>
-            <div class="proj-k">
-              <span class="chip">Optical Comms</span><span class="chip">Modulation</span><span class="chip">Signal Processing</span><span class="chip">Lab Measurement</span>
-            </div>
-          </div>
-        </article>
 
       </div>
     </div>
@@ -3192,7 +3182,7 @@
 
       <div class="board" data-rv style="--d:.06s">
 
-        <a class="tile t-pin" href="https://www.google.com/maps/place/Lisboa" target="_blank" rel="noopener" aria-label="Lisboa, Portugal">
+        <a class="tile t-pin" href="https://www.google.com/maps/place/Lisbon" target="_blank" rel="noopener" aria-label="Lisbon, Portugal">
           <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M12 22s7-6.3 7-11.5A7 7 0 0 0 5 10.5C5 15.7 12 22 12 22z"/>
             <circle cx="12" cy="10.3" r="2.7"/>
@@ -3319,7 +3309,7 @@
     <div class="footbars" aria-hidden="true"><i></i><i></i><i></i></div>
     <div class="footnote">
       <span>AFONSO LOPES</span>
-      <span>LISBOA &middot; PT</span>
+      <span>LISBON &middot; PT</span>
     </div>
   </footer>
 </main>
