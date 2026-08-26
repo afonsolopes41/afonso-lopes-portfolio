@@ -1,0 +1,19 @@
+# Tooling leftovers — not part of the site
+.agents/
+agent/
+.claude/
+skills-lock.json
+
+# Editor / OS
+.vscode/
+.idea/
+Thumbs.db
+desktop.ini
+*.swp
+*~
+
+# Backups and scratch
+*.bak
+*.orig
+*.tmp
+scratch/

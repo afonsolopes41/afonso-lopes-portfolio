@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="color-scheme" content="dark" />
+<meta name="robots" content="noindex" />
+<title>404 — Afonso Lopes</title>
+<style>
+  /* Standalone on purpose. No three.js, no CDN, no shared stylesheet:
+     this is the page that has to work when something else did not. */
+  :root{
+    --bg:#040302;
+    --ink:#eae3d6;
+    --dim:#87806f;
+    --rule:#2a251d;
+    --sig:#fa4c14;
+    --sig2:#d1102b;
+    --sig3:#4b34e6;
+    --ease:cubic-bezier(.16,1,.3,1);
+    --mono:'SF Mono','JetBrains Mono',Menlo,'Courier New',monospace;
+    --sans:'Helvetica Neue',Helvetica,Arial,sans-serif;
+    --serif:Georgia,'Iowan Old Style','Times New Roman',serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:var(--bg);}
+  html{scrollbar-width:none;-ms-overflow-style:none;}
+  html::-webkit-scrollbar{display:none;width:0;height:0;}
+  body{
+    min-height:100vh;
+    min-height:100svh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:24px;
+    color:var(--ink);
+    font-family:var(--serif);
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+
+  .corner{
+    position:fixed;
+    z-index:5;
+    font-family:var(--serif);
+    font-size:26px;
+    line-height:1;
+    color:#cfc8ba;
+    pointer-events:none;
+    user-select:none;
+  }
+  .tl{top:10px;left:12px;}
+  .tr{top:10px;right:12px;}
+  .bl{bottom:10px;left:12px;}
+  .br{bottom:10px;right:12px;}
+  @media (max-width:720px){.corner{display:none;}}
+
+  .wrap{position:relative;width:min(100%,560px);}
+
+  .noise{
+    position:absolute;
+    inset:-12% -8%;
+    font-family:var(--mono);
+    font-size:.6rem;
+    line-height:1.15;
+    letter-spacing:.14em;
+    color:#221e18;
+    white-space:pre;
+    overflow:hidden;
+    pointer-events:none;
+    user-select:none;
+    z-index:0;
+  }
+  .body{position:relative;z-index:1;}
+
+  .mark{
+    font-family:var(--mono);
+    font-size:1.05rem;
+    letter-spacing:.04em;
+    margin-bottom:22px;
+    animation:pulse 2.6s var(--ease) infinite;
+  }
+  @keyframes pulse{0%,100%{opacity:.42;}50%{opacity:1;}}
+
+  .code{
+    display:inline-block;
+    font-family:var(--mono);
+    font-size:.54rem;
+    letter-spacing:.2em;
+    color:var(--sig);
+    border:1px solid rgba(250,76,20,.35);
+    padding:5px 9px;
+    margin-bottom:18px;
+  }
+  h1{
+    font-family:var(--sans);
+    font-weight:400;
+    font-size:clamp(1.6rem,6vw,3rem);
+    letter-spacing:-.012em;
+    line-height:1.04;
+    margin:0 0 14px;
+  }
+  p{
+    font-size:clamp(.95rem,1.6vw,1.12rem);
+    line-height:1.45;
+    color:#a49c8b;
+    margin:0 0 22px;
+    max-width:52ch;
+  }
+  .path{
+    font-family:var(--mono);
+    font-size:.52rem;
+    letter-spacing:.06em;
+    color:#6f6858;
+    background:#0b0a08;
+    border:1px solid var(--rule);
+    padding:11px 12px;
+    margin:0 0 22px;
+    word-break:break-all;
+  }
+  .actions{display:flex;flex-wrap:wrap;gap:9px;}
+  .actions a{
+    font-family:var(--mono);
+    font-size:.56rem;
+    letter-spacing:.18em;
+    color:var(--dim);
+    border:1px solid var(--rule);
+    padding:11px 15px;
+    text-decoration:none;
+    transition:color .3s var(--ease),border-color .3s var(--ease),background .3s var(--ease);
+  }
+  .actions a:hover{color:#fff;border-color:var(--sig);background:rgba(250,76,20,.1);}
+
+  .bars{display:grid;grid-template-columns:repeat(3,1fr);height:10px;margin-top:26px;}
+  .bars i:nth-child(1){background:var(--sig);}
+  .bars i:nth-child(2){background:var(--sig2);}
+  .bars i:nth-child(3){background:var(--sig3);}
+
+  .cap{
+    margin-top:14px;
+    font-family:var(--mono);
+    font-size:.46rem;
+    letter-spacing:.2em;
+    color:#38332b;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .mark{animation:none;opacity:1;}
+  }
+</style>
+</head>
+<body>
+
+<span class="corner tl">A</span>
+<span class="corner tr">D</span>
+<span class="corner bl">R</span>
+<span class="corner br">L</span>
+
+<div class="wrap">
+  <pre class="noise" id="noise" aria-hidden="true"></pre>
+  <div class="body">
+    <div class="mark">&gt;|&lt;</div>
+    <span class="code">404</span>
+    <h1>There is nothing at this address.</h1>
+    <p>The page you asked for does not exist &mdash; either it never did, or it moved and I did not leave a note. The way back is one click away.</p>
+    <div class="path" id="path">&mdash;</div>
+    <div class="actions">
+      <a href="/">BACK TO THE START</a>
+      <a href="mailto:afonsorosadolopes@gmail.com?subject=Broken%20link%20on%20your%20site">TELL ME</a>
+    </div>
+    <div class="bars" aria-hidden="true"><i></i><i></i><i></i></div>
+    <div class="cap">AFONSO LOPES &middot; 404 &middot; A&ndash;01</div>
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  // The address that missed, shown back rather than hidden. Written
+  // as text, never as HTML: the path is attacker-controlled and
+  // dropping it into innerHTML would be a self-inflicted XSS on the
+  // one page guaranteed to be reachable with any URL at all.
+  var p = document.getElementById('path');
+  if (p) {
+    p.textContent = location.pathname + location.search;
+  }
+
+  if (window.matchMedia &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    return;
+  }
+
+  // Same glyph ramp the rest of the site draws with.
+  var RAMP = ' .:-=+*#%@';
+  var el = document.getElementById('noise');
+  var cols = 0, rows = 0;
+
+  function size() {
+    cols = Math.max(20, Math.floor(el.clientWidth / 9));
+    rows = Math.max(10, Math.floor(el.clientHeight / 13));
+  }
+
+  function draw() {
+    var out = '';
+    for (var y = 0; y < rows; y++) {
+      for (var x = 0; x < cols; x++) {
+        out += Math.random() < 0.14
+          ? RAMP.charAt((Math.random() * RAMP.length) | 0)
+          : ' ';
+      }
+      out += '\n';
+    }
+    el.textContent = out;
+  }
+
+  size();
+  draw();
+  window.addEventListener('resize', function () { size(); draw(); });
+  setInterval(function () {
+    if (!document.hidden) { draw(); }
+  }, 110);
+})();
+</script>
+
+</body>
+</html>
