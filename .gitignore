@@ -17,3 +17,8 @@ desktop.ini
 *.orig
 *.tmp
 scratch/
+
+# The untouched camera originals: 43 MB of HEIC/PNG kept locally as the
+# master copies. The web-sized JPEGs beside them are what ships.
+photos/_originals/
+photos/_manifest.json

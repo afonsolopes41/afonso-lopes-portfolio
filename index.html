@@ -2383,6 +2383,179 @@
     .proj{grid-template-columns:1fr;gap:10px;}
     .proj-i{padding-top:0;}
   }
+
+  /* ==============================================================
+     PHOTO PROTECTION
+     Deterrence, not protection — see the note in the script. What
+     these rules buy is that the obvious gestures (right-click save,
+     drag to desktop, select and copy) do not land on the image.
+     ============================================================== */
+  .shot img,
+  .lb-img{
+    -webkit-user-select:none;
+    user-select:none;
+    -webkit-user-drag:none;
+    -webkit-touch-callout:none;
+    pointer-events:none;
+  }
+  /* A transparent sheet over every photo. Right-click and "save image
+     as" resolve against the topmost element under the cursor, and
+     this is it — an empty div with nothing to save. */
+  .shield{
+    position:absolute;
+    inset:0;
+    z-index:3;
+    cursor:zoom-in;
+    background:transparent;
+  }
+
+  /* ==============================================================
+     LIGHTBOX
+     ============================================================== */
+  .lb{
+    position:fixed;
+    inset:0;
+    z-index:85;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    background:rgba(4,3,2,.96);
+    -webkit-backdrop-filter:blur(6px);
+    backdrop-filter:blur(6px);
+    opacity:0;
+    transition:opacity .34s var(--ease);
+  }
+  .lb.up{display:flex;opacity:1;}
+
+  .lb-stage{
+    position:relative;
+    width:min(94vw, 1500px);
+    height:min(86vh, 1000px);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .lb-frame{
+    position:relative;
+    max-width:100%;
+    max-height:100%;
+    line-height:0;
+    /* The frame is only as big as the photo inside it, so the shield
+       and the caption track the image rather than the stage. */
+    display:inline-block;
+    opacity:0;
+    transform:scale(.985);
+    transition:opacity .32s var(--ease), transform .42s var(--ease);
+  }
+  .lb.ready .lb-frame{opacity:1;transform:none;}
+  .lb-img{
+    display:block;
+    max-width:min(94vw, 1500px);
+    max-height:min(78vh, 900px);
+    width:auto;height:auto;
+    border:1px solid var(--line);
+    background:#0b0a08;
+  }
+
+  .lb-cap{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    gap:16px;
+    margin-top:12px;
+    font-family:var(--mono);
+    font-size:.56rem;
+    letter-spacing:.16em;
+    color:#a49c8b;
+    line-height:1.4;
+  }
+  .lb-cap .n{color:var(--sig);}
+
+  /* Controls */
+  .lb-x,
+  .lb-prev,
+  .lb-next{
+    position:absolute;
+    z-index:4;
+    appearance:none;
+    -webkit-appearance:none;
+    background:#141210;
+    border:1px solid var(--rule);
+    color:var(--dim);
+    font-family:var(--mono);
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    transition:
+      color .3s var(--ease),
+      border-color .3s var(--ease),
+      background .3s var(--ease);
+  }
+  .lb-x:hover,
+  .lb-prev:hover,
+  .lb-next:hover{color:#fff;border-color:var(--sig);background:rgba(250,76,20,.12);}
+  .lb-x{
+    top:max(14px, env(safe-area-inset-top));
+    right:14px;
+    width:42px;height:42px;
+    font-size:1rem;
+    border-radius:50%;
+  }
+  .lb-prev,
+  .lb-next{
+    top:50%;
+    margin-top:-26px;
+    width:44px;height:52px;
+    font-size:.9rem;
+  }
+  .lb-prev{left:max(10px, 1vw);}
+  .lb-next{right:max(10px, 1vw);}
+
+  .lb-count{
+    position:absolute;
+    left:50%;
+    transform:translateX(-50%);
+    bottom:max(14px, env(safe-area-inset-bottom));
+    font-family:var(--mono);
+    font-size:.52rem;
+    letter-spacing:.2em;
+    color:#6f6858;
+    z-index:4;
+  }
+  .lb-count b{color:var(--ink);font-weight:400;}
+
+  /* Spinner while the larger file arrives. */
+  .lb-load{
+    position:absolute;
+    font-family:var(--mono);
+    font-size:.54rem;
+    letter-spacing:.2em;
+    color:#6f6858;
+    opacity:0;
+    transition:opacity .3s var(--ease);
+  }
+  .lb.loading .lb-load{opacity:1;}
+
+  @media (max-width: 720px){
+    .lb-prev,.lb-next{
+      top:auto;bottom:56px;margin-top:0;
+      width:52px;height:44px;
+    }
+    .lb-prev{left:12px;}
+    .lb-next{right:12px;}
+    .lb-img{max-height:64vh;}
+  }
+  @media (prefers-reduced-motion: reduce){
+    .lb,.lb-frame{transition:none !important;}
+  }
+
+  /* ==============================================================
+     The rail, now that it carries 35 photos rather than 8
+     ============================================================== */
+  .shot{cursor:zoom-in;}
+  .shot .idx{z-index:4;}
+  .shot .cap{z-index:4;}
 </style>
 </head>
 <body>
@@ -2415,6 +2588,26 @@
       <div class="fault-bars" aria-hidden="true"><i></i><i></i><i></i></div>
     </div>
   </div>
+</div>
+
+<div class="lb" id="lb" role="dialog" aria-modal="true" aria-label="Photo viewer" aria-hidden="true">
+  <button class="lb-x" id="lbX" type="button" aria-label="Close">&times;</button>
+  <button class="lb-prev" id="lbPrev" type="button" aria-label="Previous photo">&#8592;</button>
+  <button class="lb-next" id="lbNext" type="button" aria-label="Next photo">&#8594;</button>
+
+  <div class="lb-stage" id="lbStage">
+    <span class="lb-load">LOADING</span>
+    <figure class="lb-frame" id="lbFrame">
+      <img class="lb-img" id="lbImg" alt="">
+      <span class="shield"></span>
+      <figcaption class="lb-cap">
+        <span id="lbCapT"></span>
+        <span class="n" id="lbCapN"></span>
+      </figcaption>
+    </figure>
+  </div>
+
+  <div class="lb-count"><b id="lbNow">01</b> / <span id="lbTot">35</span></div>
 </div>
 
 <div class="fault-strip" id="faultStrip" role="status">
@@ -2866,6 +3059,7 @@
     <div class="idcard" data-rv style="--d:.08s">
       <figure class="portrait">
         <img src="photos/afonso.jpg" alt="Afonso Lopes" width="720" height="720" loading="lazy" decoding="async">
+        <span class="shield" style="cursor:default"></span>
       </figure>
       <div class="idfacts">
         <h3 class="name">Afonso Lopes</h3>
@@ -7673,15 +7867,47 @@
   //    offset wraps at half the track width. No clone bookkeeping, no
   //    jump at the seam.
   // ----------------------------------------------------------------
+  // Ordered as the fortnight ran: opening ceremony, campus and
+  // classroom, the labs, the city, the excursions, the cohort,
+  // then certificates and the flight home. `w`/`h` are the FULL
+  // file's dimensions, used to reserve the lightbox frame before
+  // the image arrives so nothing jumps.
   var SHOTS = [
-    { file: 'chengdu-01.jpg', cap: 'UESTC' },
-    { file: 'chengdu-02.jpg', cap: 'CHENGDU' },
-    { file: 'chengdu-03.jpg', cap: 'FUTURE AIoT' },
-    { file: 'chengdu-04.jpg', cap: 'CAMPUS' },
-    { file: 'chengdu-05.jpg', cap: 'THE COHORT' },
-    { file: 'chengdu-06.jpg', cap: 'SICHUAN' },
-    { file: 'chengdu-07.jpg', cap: 'LAB' },
-    { file: 'chengdu-08.jpg', cap: 'TWO WEEKS' }
+    { f: 'chengdu-01', c: 'OPENING CEREMONY', w: 1600, h: 715 },
+    { f: 'chengdu-02', c: 'UESTC · SUMMER SCHOOL 2026', w: 1600, h: 1067 },
+    { f: 'chengdu-03', c: 'FIRST SESSION', w: 1600, h: 1253 },
+    { f: 'chengdu-04', c: 'THE ORANGE SHIRT', w: 1067, h: 1600 },
+    { f: 'chengdu-05', c: 'THE COHORT', w: 1600, h: 1200 },
+    { f: 'chengdu-06', c: 'LAB SESSION', w: 1600, h: 1067 },
+    { f: 'chengdu-07', c: 'WORKING THROUGH IT', w: 1600, h: 1065 },
+    { f: 'chengdu-08', c: 'HUMANOID LAB', w: 979, h: 1305 },
+    { f: 'chengdu-09', c: 'SERVICE ROBOT', w: 599, h: 1355 },
+    { f: 'chengdu-10', c: 'CAMPUS', w: 1035, h: 1278 },
+    { f: 'chengdu-11', c: 'THE LIBRARY', w: 1280, h: 1362 },
+    { f: 'chengdu-12', c: 'CHUNXI ROAD', w: 1200, h: 1600 },
+    { f: 'chengdu-13', c: 'CHENGDU BY NIGHT', w: 783, h: 1195 },
+    { f: 'chengdu-14', c: 'ANSHUN BRIDGE', w: 1600, h: 1200 },
+    { f: 'chengdu-15', c: 'TOWERS ON THE WATER', w: 886, h: 1228 },
+    { f: 'chengdu-16', c: 'FOUNTAINS', w: 1200, h: 1600 },
+    { f: 'chengdu-17', c: 'GIANT PANDA', w: 695, h: 1058 },
+    { f: 'chengdu-18', c: 'RED PANDA', w: 1200, h: 1600 },
+    { f: 'chengdu-19', c: 'INCENSE', w: 1600, h: 1200 },
+    { f: 'chengdu-20', c: 'TEMPLE GATE', w: 1600, h: 1600 },
+    { f: 'chengdu-21', c: 'DRESSED FOR IT', w: 1148, h: 1401 },
+    { f: 'chengdu-22', c: 'NATURAL HISTORY', w: 1200, h: 1600 },
+    { f: 'chengdu-23', c: 'DUJIANGYAN · NIGHT', w: 1600, h: 1200 },
+    { f: 'chengdu-24', c: 'DUJIANGYAN · THE WEIR', w: 1600, h: 1200 },
+    { f: 'chengdu-25', c: 'CHONGQING', w: 1600, h: 1200 },
+    { f: 'chengdu-26', c: 'CIQIKOU', w: 1200, h: 1600 },
+    { f: 'chengdu-27', c: 'THE TRAIN THROUGH THE BUILDING', w: 784, h: 1100 },
+    { f: 'chengdu-28', c: 'HONGYADONG', w: 1415, h: 797 },
+    { f: 'chengdu-29', c: 'DRONES OVER THE RIVER', w: 1104, h: 904 },
+    { f: 'chengdu-30', c: 'CHONGQING · THE BRIDGE', w: 1067, h: 1600 },
+    { f: 'chengdu-31', c: 'BY THE RIVER', w: 1600, h: 970 },
+    { f: 'chengdu-32', c: 'LAST NIGHTS', w: 1600, h: 881 },
+    { f: 'chengdu-33', c: 'CERTIFICATES', w: 1600, h: 1200 },
+    { f: 'chengdu-34', c: 'CLOSING DAY', w: 1200, h: 1600 },
+    { f: 'chengdu-35', c: 'FLYING HOME', w: 1600, h: 1200 }
   ];
 
   var railWrap = $('#railwrap');
@@ -7694,6 +7920,12 @@
   var dragX = 0;
   var dragId = null;
   var railLast = 0;
+  // Set once a pointer-down has travelled far enough to be a drag
+  // rather than a tap, so releasing after shoving the rail sideways
+  // does not also count as clicking whatever ended up under the
+  // finger.
+  var railDragged = false;
+  var railDownX = 0;
 
   function buildRail() {
     if (!rail) { return; }
@@ -7703,14 +7935,17 @@
         var s = SHOTS[i];
         var n = ('0' + (i + 1)).slice(-2);
         html +=
-          '<figure class="shot">' +
+          '<figure class="shot" data-i="' + i + '">' +
             '<span class="idx">' + n + '</span>' +
-            '<img alt="Chengdu ' + n + '" loading="lazy" ' +
-              'src="photos/' + s.file + '" ' +
+            '<img alt="' + s.c + ', Chengdu" loading="lazy" ' +
+              'decoding="async" ' +
+              'src="photos/' + s.f + '.jpg" ' +
               'onload="this.classList.add(\'ok\')" ' +
               'onerror="this.remove()">' +
-            '<span class="slot">photos/' + s.file + '</span>' +
-            '<figcaption class="cap">' + s.cap + '</figcaption>' +
+            '<span class="slot">&mdash;</span>' +
+            '<figcaption class="cap">' + s.c + '</figcaption>' +
+            // Sits above the photo so a right-click lands here.
+            '<span class="shield"></span>' +
           '</figure>';
       }
     }
@@ -7761,6 +7996,8 @@
       dragging = true;
       dragId = e.pointerId;
       dragX = e.clientX;
+      railDownX = e.clientX;
+      railDragged = false;
       railVel = 0;
       railLast = e.clientX;
       railWrap.classList.add('drag');
@@ -7771,6 +8008,7 @@
       if (!dragging || e.pointerId !== dragId) { return; }
       var dx = e.clientX - dragX;
       dragX = e.clientX;
+      if (Math.abs(e.clientX - railDownX) > 6) { railDragged = true; }
       railOff -= dx;
       railVel = dx * 0.6;
       if (railHalf) {
@@ -8262,8 +8500,169 @@
     el.textContent = age;
   });
 
+
   // ----------------------------------------------------------------
-  // 9. One loop
+  // 10. Lightbox
+  //     Opens the larger file only when a photo is actually clicked —
+  //     the rail ships 3 MB of thumbnails, the full set behind it is
+  //     10 MB, and almost nobody opens all thirty-five.
+  // ----------------------------------------------------------------
+  var lb = $('#lb');
+  var lbImg = $('#lbImg');
+  var lbFrame = $('#lbFrame');
+  var lbCapT = $('#lbCapT');
+  var lbCapN = $('#lbCapN');
+  var lbNow = $('#lbNow');
+  var lbTot = $('#lbTot');
+  var lbIndex = -1;
+  var lbLoadTimer = 0;
+
+  function lbShow(i) {
+    if (!lb || !SHOTS.length) { return; }
+    lbIndex = (i + SHOTS.length) % SHOTS.length;
+    var s = SHOTS[lbIndex];
+
+    // Reserve the frame at the photo's real aspect before it loads, so
+    // opening a landscape after a portrait does not snap the layout.
+    var maxW = Math.min(window.innerWidth * 0.94, 1500);
+    var maxH = Math.min(window.innerHeight * 0.78, 900);
+    var k = Math.min(maxW / s.w, maxH / s.h, 1);
+    lbImg.style.width = Math.round(s.w * k) + 'px';
+    lbImg.style.height = Math.round(s.h * k) + 'px';
+
+    lb.classList.add('loading');
+    lb.classList.remove('ready');
+    clearTimeout(lbLoadTimer);
+
+    lbImg.onload = function () {
+      lb.classList.remove('loading');
+      lb.classList.add('ready');
+    };
+    lbImg.onerror = function () {
+      lb.classList.remove('loading');
+    };
+    lbImg.src = 'photos/' + s.f + '-full.jpg';
+    lbImg.alt = s.c + ', Chengdu';
+
+    lbCapT.textContent = s.c;
+    lbCapN.textContent = ('0' + (lbIndex + 1)).slice(-2);
+    lbNow.textContent = ('0' + (lbIndex + 1)).slice(-2);
+
+    // Warm the neighbours so arrowing through feels instant.
+    [lbIndex + 1, lbIndex - 1].forEach(function (j) {
+      var t = SHOTS[(j + SHOTS.length) % SHOTS.length];
+      var pre = new Image();
+      pre.src = 'photos/' + t.f + '-full.jpg';
+    });
+  }
+
+  function lbOpen(i) {
+    if (!lb) { return; }
+    lbShow(i);
+    lb.classList.add('up');
+    lb.setAttribute('aria-hidden', 'false');
+    document.documentElement.style.overflow = 'hidden';
+    var x = $('#lbX');
+    if (x) { x.focus(); }
+  }
+
+  function lbClose() {
+    if (!lb) { return; }
+    lb.classList.remove('up', 'ready', 'loading');
+    lb.setAttribute('aria-hidden', 'true');
+    document.documentElement.style.overflow = '';
+    // Drop the decoded bitmap; thirty-five full-size images held in
+    // memory is real on a phone.
+    lbImg.removeAttribute('src');
+  }
+
+  if (lb) {
+    if (lbTot) { lbTot.textContent = ('0' + SHOTS.length).slice(-2); }
+
+    $('#lbX').addEventListener('click', lbClose);
+    $('#lbPrev').addEventListener('click', function () { lbShow(lbIndex - 1); });
+    $('#lbNext').addEventListener('click', function () { lbShow(lbIndex + 1); });
+
+    // Clicking the backdrop closes; clicking the photo does not.
+    lb.addEventListener('click', function (e) {
+      if (e.target === lb || e.target === $('#lbStage')) { lbClose(); }
+    });
+
+    document.addEventListener('keydown', function (e) {
+      if (!lb.classList.contains('up')) { return; }
+      if (e.key === 'Escape') { lbClose(); }
+      else if (e.key === 'ArrowRight') { lbShow(lbIndex + 1); }
+      else if (e.key === 'ArrowLeft') { lbShow(lbIndex - 1); }
+    });
+
+    // Swipe, on the frame rather than the whole overlay so a swipe
+    // that starts on the backdrop still closes by tap.
+    var sx = 0, sy = 0, st = 0;
+    lb.addEventListener('touchstart', function (e) {
+      var t = e.touches[0];
+      sx = t.clientX; sy = t.clientY; st = Date.now();
+    }, { passive: true });
+    lb.addEventListener('touchend', function (e) {
+      var t = e.changedTouches[0];
+      var dx = t.clientX - sx, dy = t.clientY - sy;
+      if (Date.now() - st > 600) { return; }
+      if (Math.abs(dx) > 48 && Math.abs(dx) > Math.abs(dy) * 1.6) {
+        lbShow(lbIndex + (dx < 0 ? 1 : -1));
+      } else if (dy > 90 && Math.abs(dy) > Math.abs(dx) * 1.6) {
+        lbClose();
+      }
+    }, { passive: true });
+  }
+
+  // Opening from the rail. Delegated, because the rail rebuilds and
+  // holds seventy figures across its two copies.
+  if (rail) {
+    rail.addEventListener('click', function (e) {
+      // A drag of the rail must not also count as a click on a photo.
+      if (railDragged) { return; }
+      var fig = e.target.closest ? e.target.closest('.shot') : null;
+      if (!fig) { return; }
+      var i = parseInt(fig.getAttribute('data-i'), 10);
+      if (!isNaN(i)) { lbOpen(i); }
+    });
+  }
+
+  // ----------------------------------------------------------------
+  // 11. Photo protection
+  //
+  //     Read this before believing the photos are safe: they are not,
+  //     and they cannot be. A browser has to receive the bytes to put
+  //     the picture on screen, so anyone who can see a photo already
+  //     has it on their machine. The network tab, the disk cache, and
+  //     the print-screen key are all outside anything a page can
+  //     reach. Nothing below changes that.
+  //
+  //     What it does buy is that the casual routes — right-click and
+  //     save, drag to the desktop, long-press on a phone — do not
+  //     land on an image. That covers the people who would have taken
+  //     one without thinking, which is most of them. It does nothing
+  //     against anyone who opens devtools, and pretending otherwise
+  //     would be the actual mistake.
+  //
+  //     The measures that do survive extraction are a visible
+  //     watermark and shipping a resolution not worth having. The
+  //     second is already done: the largest file here is 1600px on its
+  //     long edge, fine on a screen and useless for print.
+  // ----------------------------------------------------------------
+  function guard(scope) {
+    scope.addEventListener('contextmenu', function (e) {
+      if (e.target.closest && e.target.closest('.shot, .lb, .portrait')) {
+        e.preventDefault();
+      }
+    });
+    scope.addEventListener('dragstart', function (e) {
+      if (e.target.tagName === 'IMG') { e.preventDefault(); }
+    });
+  }
+  guard(document);
+
+  // ----------------------------------------------------------------
+  // 12. One loop
   // ----------------------------------------------------------------
   function resizeAll() {
     sizeMenuAscii();

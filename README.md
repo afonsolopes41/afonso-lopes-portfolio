@@ -39,6 +39,7 @@ over HTTP and it runs.
 | **Pointer** | Characters near the cursor swap for a set of louder glyphs in the accent orange, driven by movement rather than presence. |
 | **Second view** | A dragon over the summer-school section, sharing the same glyph atlas and shader through a separate renderer. Always turning; each scroll notch kicks it, and scrolling up turns it the other way. |
 | **Cursor** | Twenty spring chains of fifty nodes, drawn as additive quadratic ribbons. |
+| **Gallery** | 35 photos on a seamless drifting rail; clicking one opens a lightbox with keyboard arrows, swipe, and neighbour preloading. Thumbnails total 3 MB and are lazy; the full versions (10 MB) load only on open. |
 | **Sections** | 01 About · 02 Trajectory · 03 Projects · 04 Future AIoT · 05 Signal · 06 Domains · 07 Contact. Anything added **above** section 02 comes out of the flight budget; everything else is free. |
 | **Boot / fault** | A real progress readout over the ~1.9 MB of runtime and geometry, and a designed failure screen for when something does not arrive. |
 
@@ -178,7 +179,7 @@ its world matrix.
 | What | Where |
 |---|---|
 | The hero word | `var P_TEXT` — also update the `aria-label` and `.ptext-sr` span |
-| Chengdu photos | Drop files into `photos/` as `chengdu-01.jpg` … `chengdu-08.jpg`. They replace the placeholders on their own. Captions live in the `SHOTS` array. |
+| Chengdu photos | 35 photos in `photos/`, each at two sizes: `chengdu-NN.jpg` (760px, the rail) and `chengdu-NN-full.jpg` (1600px, the lightbox). Order and captions live in the `SHOTS` array. See `photos/README.txt`. |
 | Portrait | `photos/afonso.jpg` |
 | Age | `data-age="YYYY-MM-DD"` — computed at load, never typed |
 | Email | `var ADDRESS`, plus the `mailto:` hrefs |
@@ -264,6 +265,27 @@ Known gaps, honestly: the menu sheet does not trap keyboard focus, there
 is no skip link, and the decorative micro-labels (`SEC—01`) sit at about
 2.2:1 contrast. Everything carrying actual information clears WCAG AA at
 4.9:1 or better.
+
+---
+
+## A note on the photo "protection"
+
+The gallery blocks the context menu over photos, blocks dragging, makes
+the images unselectable, and lays a transparent shield over each one so
+"save image as" resolves against an empty div. Verified: a click over a
+photo lands on the shield, not the `<img>`.
+
+**None of that protects the photos, and it cannot.** A browser has to
+receive the bytes to draw the picture, so anyone looking at a photo
+already has it — the network tab, the disk cache and the print-screen
+key are all outside anything a page can reach. What the measures buy is
+that the casual routes do not land on an image, which covers people who
+would have grabbed one without thinking. Against anyone who opens
+devtools they do nothing.
+
+The two measures that do survive extraction are a visible watermark and
+shipping a resolution not worth having. The second is in place: 1600px
+on the long edge is fine on screen and useless for print.
 
 ---
 
