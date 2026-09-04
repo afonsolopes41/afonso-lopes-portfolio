@@ -305,6 +305,18 @@ Also used:
 - The cursor ribbon effect, ported from a widely circulated
   `useCanvasCursor` hook
 
-The **code** in this repository is MIT licensed (see `LICENSE`). The
-**photographs** are not — they are personal and are not licensed for
+The code in this repository is **published for reading, not for reuse**
+— see `LICENSE`. All rights are reserved: you are welcome to look
+through it and see how it works, but copying, adapting or redistributing
+any part of it needs written permission first.
+
+Worth being straight about what that does and does not do. A public
+repository is readable by anyone, and anyone can clone it — that is what
+public means, and no setting changes it. The licence is a legal
+statement about what someone is *allowed* to do with what they read, not
+a technical control over whether they can read it. Forking is disabled
+on the repository, which removes the one-click route but not `git
+clone`.
+
+The **photographs** are excluded entirely and are not licensed for any
 reuse.

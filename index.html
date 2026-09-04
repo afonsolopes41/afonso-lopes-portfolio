@@ -10,6 +10,13 @@
 <meta property="og:title" content="Afonso Lopes" />
 <meta property="og:description" content="Telecommunications and computer engineer — networks, cybersecurity, cloud, applied AI." />
 <meta name="theme-color" content="#040302" />
+<link rel="icon" href="favicon.ico" sizes="any" />
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png" />
+<link rel="apple-touch-icon" href="apple-touch-icon.png" />
+<meta property="og:image" content="icon-512.png" />
+<meta property="og:image:width" content="512" />
+<meta property="og:image:height" content="512" />
+<meta name="twitter:card" content="summary" />
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -3008,14 +3015,13 @@
   <div class="mp-gap"></div>
 
   <div class="mp-list">
-    <a class="mp-row" style="--i:0" href="#top"><span class="mp-n">01</span><span class="mp-t">INDEX</span><span class="mp-a">&rarr;</span></a>
-    <a class="mp-row" style="--i:1" href="#secAbout"><span class="mp-n">02</span><span class="mp-t">ABOUT</span><span class="mp-a">&rarr;</span></a>
-    <a class="mp-row" style="--i:2" href="#sectionWriting"><span class="mp-n">03</span><span class="mp-t">TRAJECTORY</span><span class="mp-a">&rarr;</span></a>
-    <a class="mp-row" style="--i:3" href="#secProjects"><span class="mp-n">04</span><span class="mp-t">PROJECTS</span><span class="mp-a">&rarr;</span></a>
-    <a class="mp-row" style="--i:4" href="#secChengdu"><span class="mp-n">05</span><span class="mp-t">FUTURE AIoT</span><span class="mp-a">&rarr;</span></a>
-    <a class="mp-row" style="--i:5" href="#secSignal"><span class="mp-n">06</span><span class="mp-t">SIGNAL</span><span class="mp-a">&rarr;</span></a>
-    <a class="mp-row" style="--i:6" href="#secDomains"><span class="mp-n">07</span><span class="mp-t">DOMAINS</span><span class="mp-a">&rarr;</span></a>
-    <a class="mp-row" style="--i:7" href="#secContact"><span class="mp-n">08</span><span class="mp-t">CONTACT</span><span class="mp-a">&rarr;</span></a>
+    <a class="mp-row" style="--i:0" href="#secAbout"><span class="mp-n">01</span><span class="mp-t">ABOUT</span><span class="mp-a">&rarr;</span></a>
+    <a class="mp-row" style="--i:1" href="#sectionWriting"><span class="mp-n">02</span><span class="mp-t">TRAJECTORY</span><span class="mp-a">&rarr;</span></a>
+    <a class="mp-row" style="--i:2" href="#secProjects"><span class="mp-n">03</span><span class="mp-t">PROJECTS</span><span class="mp-a">&rarr;</span></a>
+    <a class="mp-row" style="--i:3" href="#secChengdu"><span class="mp-n">04</span><span class="mp-t">FUTURE AIoT</span><span class="mp-a">&rarr;</span></a>
+    <a class="mp-row" style="--i:4" href="#secSignal"><span class="mp-n">05</span><span class="mp-t">SIGNAL</span><span class="mp-a">&rarr;</span></a>
+    <a class="mp-row" style="--i:5" href="#secDomains"><span class="mp-n">06</span><span class="mp-t">DOMAINS</span><span class="mp-a">&rarr;</span></a>
+    <a class="mp-row" style="--i:6" href="#secContact"><span class="mp-n">07</span><span class="mp-t">CONTACT</span><span class="mp-a">&rarr;</span></a>
   </div>
 
   <div class="mp-ascii"><canvas id="menuAscii"></canvas></div>
@@ -7881,7 +7887,6 @@
     { f: 'chengdu-06', c: 'LAB SESSION', w: 1600, h: 1067 },
     { f: 'chengdu-07', c: 'WORKING THROUGH IT', w: 1600, h: 1065 },
     { f: 'chengdu-08', c: 'HUMANOID LAB', w: 979, h: 1305 },
-    { f: 'chengdu-09', c: 'SERVICE ROBOT', w: 599, h: 1355 },
     { f: 'chengdu-10', c: 'CAMPUS', w: 1035, h: 1278 },
     { f: 'chengdu-11', c: 'THE LIBRARY', w: 1280, h: 1362 },
     { f: 'chengdu-12', c: 'CHUNXI ROAD', w: 1200, h: 1600 },
@@ -7926,6 +7931,7 @@
   // finger.
   var railDragged = false;
   var railDownX = 0;
+  var railDownFig = null;
 
   function buildRail() {
     if (!rail) { return; }
@@ -7998,6 +8004,14 @@
       dragX = e.clientX;
       railDownX = e.clientX;
       railDragged = false;
+      // Captured at pointerDOWN, because by pointerup it is too late:
+      // setPointerCapture below retargets every later pointer event —
+      // and the click derived from them — onto #railwrap, so the
+      // figure is no longer the event target. This is why clicking a
+      // photo showed the zoom cursor and then did nothing.
+      railDownFig = e.target && e.target.closest
+        ? e.target.closest('.shot')
+        : null;
       railVel = 0;
       railLast = e.clientX;
       railWrap.classList.add('drag');
@@ -8027,6 +8041,16 @@
         dragging = false;
         dragId = null;
         railWrap.classList.remove('drag');
+
+        // A release that never travelled is a tap: open the photo the
+        // press started on. Anything past the drag threshold was a
+        // shove of the rail and opens nothing.
+        if (ev === 'pointerup' && !railDragged && railDownFig &&
+            typeof window.__openShot === 'function') {
+          var idx = parseInt(railDownFig.getAttribute('data-i'), 10);
+          if (!isNaN(idx)) { window.__openShot(idx); }
+        }
+        railDownFig = null;
       });
     });
 
@@ -8614,16 +8638,32 @@
     }, { passive: true });
   }
 
-  // Opening from the rail. Delegated, because the rail rebuilds and
-  // holds seventy figures across its two copies.
-  if (rail) {
-    rail.addEventListener('click', function (e) {
-      // A drag of the rail must not also count as a click on a photo.
-      if (railDragged) { return; }
-      var fig = e.target.closest ? e.target.closest('.shot') : null;
-      if (!fig) { return; }
-      var i = parseInt(fig.getAttribute('data-i'), 10);
-      if (!isNaN(i)) { lbOpen(i); }
+  // The rail's pointerup handler calls this. It cannot use a click
+  // listener: the rail takes pointer capture while dragging, which
+  // retargets the click away from the figure that was pressed.
+  window.__openShot = lbOpen;
+
+  // Keyboard: the figures are not focusable, so the rail itself takes
+  // Enter and opens whatever is nearest the middle of the viewport.
+  if (railWrap) {
+    railWrap.setAttribute('tabindex', '0');
+    railWrap.setAttribute('role', 'button');
+    railWrap.setAttribute('aria-label', 'Chengdu photos — press Enter to open the gallery');
+    railWrap.addEventListener('keydown', function (e) {
+      if (e.key !== 'Enter' && e.key !== ' ') { return; }
+      e.preventDefault();
+      var mid = window.innerWidth / 2;
+      var best = null, bestD = 1e9;
+      var figs = rail ? rail.querySelectorAll('.shot') : [];
+      for (var i = 0; i < figs.length; i++) {
+        var r = figs[i].getBoundingClientRect();
+        var d = Math.abs((r.left + r.right) / 2 - mid);
+        if (d < bestD) { bestD = d; best = figs[i]; }
+      }
+      if (best) {
+        var k = parseInt(best.getAttribute('data-i'), 10);
+        if (!isNaN(k)) { lbOpen(k); }
+      }
     });
   }
 
